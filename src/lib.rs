@@ -45,8 +45,6 @@
 //!     z: [[u8; 64]; 64],
 //! }
 //! ```
-#![feature(asm_const)]
-#![cfg_attr(feature = "doc_cfg", feature(doc_cfg))]
 
 mod emu;
 mod genlut;
@@ -57,9 +55,7 @@ pub use crate::{emu::*, genlut::*, load_store::*, ops::AmxOps, regs::*};
 
 cfg_if::cfg_if! {
     if #[cfg(any(doc, target_arch = "aarch64"))] {
-        #[cfg_attr(feature = "doc_cfg", doc(cfg(target_arch = "aarch64")))]
         mod nativectx;
-        #[cfg_attr(feature = "doc_cfg", doc(cfg(target_arch = "aarch64")))]
         pub mod nativeops;
         pub use crate::nativectx::{AmxCtx, NewAmxCtxError};
     }
