@@ -46,12 +46,11 @@
 //! }
 //! ```
 
-mod emu;
 mod genlut;
 mod load_store;
 mod ops;
 mod regs;
-pub use crate::{emu::*, genlut::*, load_store::*, ops::AmxOps, regs::*};
+pub use crate::{genlut::*, load_store::*, ops::AmxOps, regs::*};
 
 cfg_if::cfg_if! {
     if #[cfg(any(doc, target_arch = "aarch64"))] {
@@ -64,7 +63,7 @@ cfg_if::cfg_if! {
 /// The prelude.
 pub mod prelude {
     #[doc(no_inline)]
-    pub use crate::{ops::AmxOps as _, Amx as _};
+    pub use crate::{Amx as _, ops::AmxOps as _};
 }
 
 /// A high-level wrapper for AMX instructions.
@@ -91,7 +90,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn load512<T>(&mut self, ptr: *const T, row: impl LoadStore) {
-        row.load512(self, ptr);
+        unsafe {
+            row.load512(self, ptr);
+        }
     }
 
     /// Load 1024 bits (128 bytes) from memory to the specified register row
@@ -100,7 +101,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn load1024_aligned<T>(&mut self, ptr: *const T, row: impl LoadStore) {
-        row.load1024_aligned(self, ptr);
+        unsafe {
+            row.load1024_aligned(self, ptr);
+        }
     }
 
     /// Store 512 bits (64 bytes) the specified register row's contents to
@@ -108,7 +111,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn store512<T>(&mut self, ptr: *mut T, row: impl LoadStore) {
-        row.store512(self, ptr);
+        unsafe {
+            row.store512(self, ptr);
+        }
     }
 
     /// Store 1024 bits (128 bytes) the specified register row and the
@@ -117,7 +122,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn store1024_aligned<T>(&mut self, ptr: *mut T, row: impl LoadStore) {
-        row.store1024_aligned(self, ptr);
+        unsafe {
+            row.store1024_aligned(self, ptr);
+        }
     }
 
     /// Load 512 bits (64 bytes) from memory to `z[index][0..64]` with interleaving.
@@ -126,7 +133,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn load512_interleaved<T>(&mut self, ptr: *const T, row: ZRow) {
-        load512_z_interleaved(self, ptr, row);
+        unsafe {
+            load512_z_interleaved(self, ptr, row);
+        }
     }
 
     /// Store 512 bits (64 bytes) `z[index][0..64]` to memory with interleaving.
@@ -135,7 +144,9 @@ pub trait Amx: crate::ops::AmxOps {
     #[inline(always)]
     #[track_caller]
     unsafe fn store512_interleaved<T>(&mut self, ptr: *mut T, row: ZRow) {
-        store512_z_interleaved(self, ptr, row);
+        unsafe {
+            store512_z_interleaved(self, ptr, row);
+        }
     }
 
     /// Read the whole contents of `x`.

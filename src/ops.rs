@@ -30,28 +30,28 @@ pub unsafe trait AmxOps {
 // Safety: Just forwarding the calls
 unsafe impl<T: ?Sized + AmxOps> AmxOps for &'_ mut T {
     unsafe fn ldx(&mut self, x: u64, ptr: *mut ()) {
-        (**self).ldx(x, ptr)
+        unsafe { (**self).ldx(x, ptr) }
     }
     unsafe fn ldy(&mut self, x: u64, ptr: *mut ()) {
-        (**self).ldy(x, ptr)
+        unsafe { (**self).ldy(x, ptr) }
     }
     unsafe fn stx(&mut self, x: u64, ptr: *mut ()) {
-        (**self).stx(x, ptr)
+        unsafe { (**self).stx(x, ptr) }
     }
     unsafe fn sty(&mut self, x: u64, ptr: *mut ()) {
-        (**self).sty(x, ptr)
+        unsafe { (**self).sty(x, ptr) }
     }
     unsafe fn ldz(&mut self, x: u64, ptr: *mut ()) {
-        (**self).ldz(x, ptr)
+        unsafe { (**self).ldz(x, ptr) }
     }
     unsafe fn stz(&mut self, x: u64, ptr: *mut ()) {
-        (**self).stz(x, ptr)
+        unsafe { (**self).stz(x, ptr) }
     }
     unsafe fn ldzi(&mut self, x: u64, ptr: *mut ()) {
-        (**self).ldzi(x, ptr)
+        unsafe { (**self).ldzi(x, ptr) }
     }
     unsafe fn stzi(&mut self, x: u64, ptr: *mut ()) {
-        (**self).stzi(x, ptr)
+        unsafe { (**self).stzi(x, ptr) }
     }
     fn extrx(&mut self, x: u64) {
         (**self).extrx(x)

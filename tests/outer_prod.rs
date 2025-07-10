@@ -1,4 +1,4 @@
-use amx::{prelude::*, XBytes, XRow, YBytes, YRow, ZRow};
+use amx::{XBytes, XRow, YBytes, YRow, ZRow, prelude::*};
 use itertools::iproduct;
 
 fn init() {

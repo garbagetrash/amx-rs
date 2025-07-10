@@ -1,4 +1,4 @@
-use amx::{prelude::*, XBytes, YBytes, ZRow};
+use amx::{XBytes, YBytes, ZRow, prelude::*};
 use clap::Parser;
 use std::time::Instant;
 

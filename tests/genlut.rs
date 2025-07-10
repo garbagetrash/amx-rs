@@ -1,4 +1,4 @@
-use amx::{prelude::*, Index4, Normal, XBytes, XRow, YBytes, YRow, X8};
+use amx::{Index4, Normal, X8, XBytes, XRow, YBytes, YRow, prelude::*};
 use either::{Left, Right};
 use quickcheck::TestResult;
 

@@ -1,6 +1,6 @@
 #![feature(array_chunks)]
 use aligned_box::AlignedBox;
-use amx::{prelude::*, AmxOps, XRow, YRow, ZRow};
+use amx::{AmxOps, XRow, YRow, ZRow, prelude::*};
 use itertools::iproduct;
 
 fn init() {

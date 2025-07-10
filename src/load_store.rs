@@ -1,6 +1,6 @@
 use crate::{
-    regs::{XRow, YRow, ZRow},
     AmxOps,
+    regs::{XRow, YRow, ZRow},
 };
 
 /// The parameters of AMX's load and store instructions.
@@ -59,33 +59,41 @@ pub trait LoadStore {
 impl<Left: LoadStore, Right: LoadStore> LoadStore for either::Either<Left, Right> {
     #[inline]
     unsafe fn load512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        match self {
-            either::Left(x) => x.load512(ops, ptr),
-            either::Right(x) => x.load512(ops, ptr),
+        unsafe {
+            match self {
+                either::Left(x) => x.load512(ops, ptr),
+                either::Right(x) => x.load512(ops, ptr),
+            }
         }
     }
 
     #[inline]
     unsafe fn store512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        match self {
-            either::Left(x) => x.store512(ops, ptr),
-            either::Right(x) => x.store512(ops, ptr),
+        unsafe {
+            match self {
+                either::Left(x) => x.store512(ops, ptr),
+                either::Right(x) => x.store512(ops, ptr),
+            }
         }
     }
 
     #[inline]
     unsafe fn load1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        match self {
-            either::Left(x) => x.load1024_aligned(ops, ptr),
-            either::Right(x) => x.load1024_aligned(ops, ptr),
+        unsafe {
+            match self {
+                either::Left(x) => x.load1024_aligned(ops, ptr),
+                either::Right(x) => x.load1024_aligned(ops, ptr),
+            }
         }
     }
 
     #[inline]
     unsafe fn store1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        match self {
-            either::Left(x) => x.store1024_aligned(ops, ptr),
-            either::Right(x) => x.store1024_aligned(ops, ptr),
+        unsafe {
+            match self {
+                either::Left(x) => x.store1024_aligned(ops, ptr),
+                either::Right(x) => x.store1024_aligned(ops, ptr),
+            }
         }
     }
 }
@@ -94,61 +102,69 @@ impl LoadStore for XRow {
     #[inline(always)]
     #[track_caller]
     unsafe fn load512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.ldx(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.ldx(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.stx(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.stx(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn load1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.ldx(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.ldx(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.stx(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.stx(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 }
 
@@ -156,61 +172,69 @@ impl LoadStore for YRow {
     #[inline(always)]
     #[track_caller]
     unsafe fn load512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.ldy(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.ldy(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.sty(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.sty(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn load1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.ldy(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.ldy(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 8);
-        ops.sty(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 8);
+            ops.sty(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 }
 
@@ -218,61 +242,69 @@ impl LoadStore for ZRow {
     #[inline(always)]
     #[track_caller]
     unsafe fn load512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 64);
-        ops.ldz(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 64);
+            ops.ldz(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store512<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 64);
-        ops.stz(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_64,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 64);
+            ops.stz(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_64,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn load1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *const T) {
-        let index = self.0;
-        assert!(index < 64);
-        ops.ldz(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 64);
+            ops.ldz(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 
     #[inline(always)]
     #[track_caller]
     unsafe fn store1024_aligned<T>(&self, ops: &mut (impl AmxOps + ?Sized), ptr: *mut T) {
-        let index = self.0;
-        assert!(index < 64);
-        ops.stz(
-            MemArgs {
-                reg_offset: index as u64,
-                size: MemSize::_128,
-            }
-            .encode(),
-            ptr as *mut (),
-        );
+        unsafe {
+            let index = self.0;
+            assert!(index < 64);
+            ops.stz(
+                MemArgs {
+                    reg_offset: index as u64,
+                    size: MemSize::_128,
+                }
+                .encode(),
+                ptr as *mut (),
+            );
+        }
     }
 }
 
@@ -286,15 +318,17 @@ pub(crate) unsafe fn load512_z_interleaved<T>(
     ptr: *const T,
     ZRow(index): ZRow,
 ) {
-    assert!(index < 64);
-    ops.ldzi(
-        MemArgs {
-            reg_offset: index as u64,
-            size: MemSize::_64,
-        }
-        .encode(),
-        ptr as *mut (),
-    );
+    unsafe {
+        assert!(index < 64);
+        ops.ldzi(
+            MemArgs {
+                reg_offset: index as u64,
+                size: MemSize::_64,
+            }
+            .encode(),
+            ptr as *mut (),
+        );
+    }
 }
 
 /// Store 512 bits (64 bytes) `z[index][0..64]` to memory with interleaving.
@@ -307,13 +341,15 @@ pub(crate) unsafe fn store512_z_interleaved<T>(
     ptr: *mut T,
     ZRow(index): ZRow,
 ) {
-    assert!(index < 64);
-    ops.stzi(
-        MemArgs {
-            reg_offset: index as u64,
-            size: MemSize::_64,
-        }
-        .encode(),
-        ptr as *mut (),
-    );
+    unsafe {
+        assert!(index < 64);
+        ops.stzi(
+            MemArgs {
+                reg_offset: index as u64,
+                size: MemSize::_64,
+            }
+            .encode(),
+            ptr as *mut (),
+        );
+    }
 }

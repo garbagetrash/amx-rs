@@ -1,7 +1,7 @@
 //! Wrapper for the `genlut` instruction
 use crate::{
-    regs::{XBytes, XRow, YBytes, YRow, ZRow},
     AmxOps,
+    regs::{XBytes, XRow, YBytes, YRow, ZRow},
 };
 
 /// The trait for marker types specifying `genlut` instruction's LUT type.
