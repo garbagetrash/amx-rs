@@ -231,6 +231,40 @@ pub trait Amx: crate::ops::AmxOps {
         );
     }
 
+    /// Calculate the outer product of `x: [f32; 16]` and `y: [f32; 16]` and write
+    /// the output to every second row of `z: [[f32; 16]; 32]`.
+    ///
+    /// If `x_offset_bytes` and/or `y_offset_bytes` are `None`, the respective
+    /// registers will be excluded from the operation (not performing
+    /// multiplication).
+    ///
+    /// `z_index` must be in range `0..64`. Only the least significant bit of
+    /// `z_index` will be taken into consideration.
+    #[inline(always)]
+    fn outer_product_f32_xy_to_z(
+        &mut self,
+        x_offset_bytes: Option<XBytes>,
+        y_offset_bytes: Option<YBytes>,
+        z_index: ZRow,
+        accumulate: bool,
+    ) {
+        // FIXME: rustfmt doesn't like patterns in provided trait methods
+        let z_index = z_index.0;
+        debug_assert!(x_offset_bytes.unwrap_or_default().0 < 0x200);
+        debug_assert!(y_offset_bytes.unwrap_or_default().0 < 0x200);
+        debug_assert!(z_index < 64);
+        // TODO: widening (i32 output)
+        // TODO: vector output (reducing)
+        self.fma32(
+            (y_offset_bytes.unwrap_or_default().0
+                | (x_offset_bytes.unwrap_or_default().0 << 10)
+                | (z_index << 20)
+                | (((!accumulate) as usize) << 27)
+                | ((x_offset_bytes.is_none() as usize) << 28)
+                | ((y_offset_bytes.is_none() as usize) << 29)) as u64,
+        );
+    }
+
     /// Perform (reverse) table lookup.
     #[inline(always)]
     fn lut(&mut self, input: impl LutIn, table: XRow, output: impl LutOut, ty: impl LutTy) {
