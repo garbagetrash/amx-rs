@@ -232,14 +232,14 @@ pub trait Amx: crate::ops::AmxOps {
     }
 
     /// Calculate the outer product of `x: [f32; 16]` and `y: [f32; 16]` and write
-    /// the output to every second row of `z: [[f32; 16]; 32]`.
+    /// the output to every fourth row of `z: [[f32; 16]; 64]`.
     ///
     /// If `x_offset_bytes` and/or `y_offset_bytes` are `None`, the respective
     /// registers will be excluded from the operation (not performing
     /// multiplication).
     ///
-    /// `z_index` must be in range `0..64`. Only the least significant bit of
-    /// `z_index` will be taken into consideration.
+    /// `z_index` must be in range `0..64`. Only the 2 least significant bits
+    /// of `z_index` will be taken into consideration.
     #[inline(always)]
     fn outer_product_f32_xy_to_z(
         &mut self,
@@ -253,7 +253,7 @@ pub trait Amx: crate::ops::AmxOps {
         debug_assert!(x_offset_bytes.unwrap_or_default().0 < 0x200);
         debug_assert!(y_offset_bytes.unwrap_or_default().0 < 0x200);
         debug_assert!(z_index < 64);
-        // TODO: widening (i32 output)
+        // TODO: widening (f64 output)
         // TODO: vector output (reducing)
         self.fma32(
             (y_offset_bytes.unwrap_or_default().0

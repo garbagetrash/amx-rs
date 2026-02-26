@@ -2,10 +2,6 @@ use amx::{Index4, Normal, X8, XBytes, XRow, YBytes, YRow, prelude::*};
 use either::{Left, Right};
 use quickcheck::TestResult;
 
-fn init() {
-    let _ = env_logger::builder().is_test(true).try_init();
-}
-
 fn overlaps(x: std::ops::Range<usize>, y: std::ops::Range<usize>) -> bool {
     x.start < y.end && x.end > y.start
 }
@@ -33,13 +29,6 @@ fn qc_genlut_lut8x16(
     ) {
         return TestResult::discard();
     }
-
-    log::debug!("values = {:x?}", values);
-    log::debug!("indices = {:x?}", indices);
-    log::debug!("table_row = {:x?}", table_row);
-    log::debug!("index_offset = {:x?}", index_offset);
-    log::debug!("out_row = {:x?}", out_row);
-    log::debug!("indices_in_y = {:x?}", indices_in_y);
 
     let mut got = [0u8; 64];
     let mut ctx = amx::AmxCtx::new().unwrap();
@@ -86,10 +75,6 @@ fn qc_genlut_lut8x16(
             values[idx]
         })
         .collect();
-
-    log::debug!("got = {:x?}", got);
-    log::debug!("expected = {:x?}", expected);
-    log::debug!("all_x = {:x?}", all_x);
 
     assert_eq!(
         got[..],

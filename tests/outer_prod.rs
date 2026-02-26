@@ -1,10 +1,6 @@
 use amx::{XBytes, XRow, YBytes, YRow, ZRow, prelude::*};
 use itertools::iproduct;
 
-fn init() {
-    let _ = env_logger::builder().is_test(true).try_init();
-}
-
 struct Xorshift32(u32);
 
 impl Xorshift32 {
@@ -27,7 +23,6 @@ fn read_array_wrapping<T: Copy, const N: usize>(a: &[T], i: usize) -> [T; N] {
 
 #[test]
 fn outer_product_i16_xy_to_z() {
-    init();
     unsafe {
         let mut ctx = amx::AmxCtx::new().unwrap();
 
@@ -41,19 +36,11 @@ fn outer_product_i16_xy_to_z() {
             ctx.load512(&in_y[i * 64], YRow(i));
         }
 
-        log::info!("x = {:?}", *(in_x.as_ptr() as *const [[u16; 32]; 8]));
-        log::info!("y = {:?}", *(in_y.as_ptr() as *const [[u16; 32]; 8]));
-
         for (x_offset, y_offset, &z_index) in iproduct!(
             (0..0x200).step_by(31),
             (0..0x200).step_by(47),
             &[0, 1, 50, 63]
         ) {
-            log::debug!(
-                "(x_offset, y_offset, z_index) = {:?}",
-                (x_offset, y_offset, z_index)
-            );
-
             ctx.outer_product_i16_xy_to_z(
                 Some(XBytes(x_offset)),
                 Some(YBytes(y_offset)),

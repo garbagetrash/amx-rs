@@ -1,11 +1,6 @@
-#![feature(array_chunks)]
 use aligned_box::AlignedBox;
 use amx::{AmxOps, XRow, YRow, ZRow, prelude::*};
 use itertools::iproduct;
-
-fn init() {
-    let _ = env_logger::builder().is_test(true).try_init();
-}
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[repr(u8)]
@@ -33,29 +28,31 @@ unsafe fn load_generic<T>(
     reg: u8,
     interleaved: bool,
 ) {
-    match (size, reg, interleaved) {
-        (MemSize::_64, 0, false) => {
-            ctx.load512(ptr, XRow(index));
+    unsafe {
+        match (size, reg, interleaved) {
+            (MemSize::_64, 0, false) => {
+                ctx.load512(ptr, XRow(index));
+            }
+            (MemSize::_64, 1, false) => {
+                ctx.load512(ptr, YRow(index));
+            }
+            (MemSize::_64, 2, false) => {
+                ctx.load512(ptr, ZRow(index));
+            }
+            (MemSize::_64, 2, true) => {
+                ctx.load512_interleaved(ptr, ZRow(index));
+            }
+            (MemSize::_128, 0, false) => {
+                ctx.load1024_aligned(ptr, XRow(index));
+            }
+            (MemSize::_128, 1, false) => {
+                ctx.load1024_aligned(ptr, YRow(index));
+            }
+            (MemSize::_128, 2, false) => {
+                ctx.load1024_aligned(ptr, ZRow(index));
+            }
+            _ => unreachable!(),
         }
-        (MemSize::_64, 1, false) => {
-            ctx.load512(ptr, YRow(index));
-        }
-        (MemSize::_64, 2, false) => {
-            ctx.load512(ptr, ZRow(index));
-        }
-        (MemSize::_64, 2, true) => {
-            ctx.load512_interleaved(ptr, ZRow(index));
-        }
-        (MemSize::_128, 0, false) => {
-            ctx.load1024_aligned(ptr, XRow(index));
-        }
-        (MemSize::_128, 1, false) => {
-            ctx.load1024_aligned(ptr, YRow(index));
-        }
-        (MemSize::_128, 2, false) => {
-            ctx.load1024_aligned(ptr, ZRow(index));
-        }
-        _ => unreachable!(),
     }
 }
 
@@ -67,35 +64,36 @@ unsafe fn store_generic<T>(
     reg: u8,
     interleaved: bool,
 ) {
-    match (size, reg, interleaved) {
-        (MemSize::_64, 0, false) => {
-            ctx.store512(ptr, XRow(index));
+    unsafe {
+        match (size, reg, interleaved) {
+            (MemSize::_64, 0, false) => {
+                ctx.store512(ptr, XRow(index));
+            }
+            (MemSize::_64, 1, false) => {
+                ctx.store512(ptr, YRow(index));
+            }
+            (MemSize::_64, 2, false) => {
+                ctx.store512(ptr, ZRow(index));
+            }
+            (MemSize::_64, 2, true) => {
+                ctx.store512_interleaved(ptr, ZRow(index));
+            }
+            (MemSize::_128, 0, false) => {
+                ctx.store1024_aligned(ptr, XRow(index));
+            }
+            (MemSize::_128, 1, false) => {
+                ctx.store1024_aligned(ptr, YRow(index));
+            }
+            (MemSize::_128, 2, false) => {
+                ctx.store1024_aligned(ptr, ZRow(index));
+            }
+            _ => unreachable!(),
         }
-        (MemSize::_64, 1, false) => {
-            ctx.store512(ptr, YRow(index));
-        }
-        (MemSize::_64, 2, false) => {
-            ctx.store512(ptr, ZRow(index));
-        }
-        (MemSize::_64, 2, true) => {
-            ctx.store512_interleaved(ptr, ZRow(index));
-        }
-        (MemSize::_128, 0, false) => {
-            ctx.store1024_aligned(ptr, XRow(index));
-        }
-        (MemSize::_128, 1, false) => {
-            ctx.store1024_aligned(ptr, YRow(index));
-        }
-        (MemSize::_128, 2, false) => {
-            ctx.store1024_aligned(ptr, ZRow(index));
-        }
-        _ => unreachable!(),
     }
 }
 
 #[test]
 fn copy_and_check_memory() {
-    init();
     let mut ctx = amx::AmxCtx::new().unwrap();
 
     let mut src: AlignedBox<[u16]> = AlignedBox::slice_from_default(0x80, 4096).unwrap();
@@ -115,14 +113,6 @@ fn copy_and_check_memory() {
         if reg != 2 && reg_offset >= 8 {
             continue;
         }
-
-        log::debug!(
-            "size = {:?}, reg = amx{}, reg_offset = {}, interleaved = {}",
-            size,
-            reg,
-            reg_offset,
-            interleaved
-        );
 
         let mut got: AlignedBox<[u16]> = AlignedBox::slice_from_value(0x80, 4096, 0xbeef).unwrap();
         let expected: Vec<u16> = (0..4096)
@@ -153,7 +143,6 @@ fn copy_and_check_memory() {
 
 #[test]
 fn load_and_check_register() {
-    init();
     let mut ctx = amx::AmxCtx::new().unwrap();
 
     let mut pat1: AlignedBox<[u64]> = AlignedBox::slice_from_default(0x80, 16).unwrap();
@@ -175,14 +164,6 @@ fn load_and_check_register() {
         if reg != 2 && reg_offset >= 8 {
             continue;
         }
-
-        log::debug!(
-            "size = {:?}, reg = amx{}, reg_offset = {}, interleaved = {}",
-            size,
-            reg,
-            reg_offset,
-            interleaved
-        );
 
         // Number of `u64`s in the register set
         let reg_size = [64, 64, 512][reg as usize];
@@ -214,8 +195,11 @@ fn load_and_check_register() {
             _ => unreachable!(),
         };
         let got: Vec<u64> = got
-            .array_chunks::<8>()
-            .map(|x| u64::from_le_bytes(*x))
+            .chunks(8)
+            .map(|x| {
+                let arr: [u8; 8] = (*x).try_into().unwrap();
+                u64::from_le_bytes(arr)
+            })
             .collect();
 
         // Calculate the expected result
